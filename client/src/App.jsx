@@ -3,7 +3,7 @@ import { Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate } from
 import {
   ArrowDownLeft, ArrowLeftRight, ArrowUpRight, BadgeIndianRupee, BarChart3, Check,
   ChevronRight, CircleHelp, CreditCard, Download, Eye, EyeOff, House, LayoutDashboard,
-  LogOut, Plus, Search, Settings, ShieldCheck, Sparkles, Target, Trash2, TrendingUp,
+  LogOut, Moon, Plus, Search, Settings, ShieldCheck, Sparkles, Sun, Target, Trash2, TrendingUp,
   Wallet, X,
 } from 'lucide-react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -14,6 +14,12 @@ const pageTitles = { dashboard: 'Overview', transactions: 'Transactions', budget
 
 function Brand({ light = false }) {
   return <Link className={`brand ${light ? 'brand-light' : ''}`} to="/"><span className="brand-mark"><Wallet size={19} strokeWidth={2.4} /></span><span>spendsmart<span className="brand-period">.</span></span></Link>;
+}
+
+function ThemeToggle({ theme, onToggle }) {
+  const dark = theme === 'dark';
+  const LabelIcon = dark ? Sun : Moon;
+  return <button className="theme-toggle" type="button" onClick={onToggle} aria-label={`Switch to ${dark ? 'light' : 'dark'} theme`} aria-pressed={dark} title={`Switch to ${dark ? 'light' : 'dark'} theme`}><LabelIcon size={17} /><span>{dark ? 'Light mode' : 'Dark mode'}</span></button>;
 }
 
 function MoneyArtwork({ compact = false }) {
@@ -34,9 +40,9 @@ function MoneyArtwork({ compact = false }) {
   </div>;
 }
 
-function Landing() {
+function Landing({ theme, onToggleTheme }) {
   return <main className="landing-page">
-    <header className="landing-nav"><Brand /><nav><Link to="/login">Log in</Link><Link className="button button-dark button-small" to="/register">Create free account <ArrowUpRight size={15} /></Link></nav></header>
+    <header className="landing-nav"><Brand /><nav><ThemeToggle theme={theme} onToggle={onToggleTheme} /><Link to="/login">Log in</Link><Link className="button button-dark button-small" to="/register">Create free account <ArrowUpRight size={15} /></Link></nav></header>
     <section className="hero">
       <div className="hero-copy"><span className="eyebrow"><Sparkles size={14} /> A calmer way to manage money</span>
         <h1>Your money,<br />with a little more <em>magic.</em></h1>
@@ -52,7 +58,7 @@ function Landing() {
   </main>;
 }
 
-function Auth({ register, auth }) {
+function Auth({ register, auth, theme, onToggleTheme }) {
   const nav = useNavigate();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
@@ -66,7 +72,7 @@ function Auth({ register, auth }) {
     finally { setBusy(false); }
   }
   return <main className="auth-page">
-    <Link to="/" className="auth-back"><span>←</span> Back to home</Link>
+    <div className="auth-toolbar"><Link to="/" className="auth-back"><span>←</span> Back to home</Link><ThemeToggle theme={theme} onToggle={onToggleTheme} /></div>
     <div className="auth-layout">
       <section className="auth-art-panel"><div className="auth-art-copy"><Brand light /><span className="eyebrow eyebrow-light"><Sparkles size={14} /> Your next chapter starts here</span><h2>Little money<br />habits. <em>Big-life</em><br />energy.</h2><p>A clear view of today makes it easier to plan for tomorrow.</p></div><MoneyArtwork compact /><div className="auth-art-bottom"><span className="auth-check"><Check size={14} /></span> A fresh start, one smart choice at a time.</div></section>
       <section className="auth-form-side"><form className="auth-form" onSubmit={submit}>
@@ -91,11 +97,11 @@ const navItems = [
   ['budgets', 'Budgets', Wallet], ['analytics', 'Insights', BarChart3], ['goals', 'Savings goals', Target], ['settings', 'Settings', Settings],
 ];
 
-function Shell({ children, user, logout }) {
+function Shell({ children, user, logout, theme, onToggleTheme }) {
   const location = useLocation();
   const title = pageTitles[location.pathname.slice(1)] || 'Overview';
   return <div className="app-shell"><aside className="sidebar"><Brand /><div className="side-label">YOUR MONEY</div><nav className="side-nav">{navItems.map(([path, label, Icon]) => <NavLink key={path} to={`/${path}`} className={({ isActive }) => `side-link ${isActive ? 'selected' : ''}`}><Icon size={18} strokeWidth={1.9} /><span>{label}</span>{path === 'dashboard' && <i className="nav-dot" />}</NavLink>)}</nav><div className="sidebar-tip"><span className="tip-spark"><Sparkles size={15} /></span><b>A little progress<br />is still progress.</b><small>Keep showing up for your goals.</small></div><div className="side-profile"><div className="profile-avatar">{user?.name?.[0]?.toUpperCase() || 'S'}</div><div className="profile-details"><b>{user?.name || 'Your account'}</b><small>Personal account</small></div><button className="icon-button logout-button" title="Sign out" onClick={logout}><LogOut size={17} /></button></div></aside>
-    <main className="app-main"><header className="topbar"><div className="breadcrumb"><span>Workspace</span><ChevronRight size={14} /><b>{title}</b></div><div className="topbar-right"><span className="today-pill"><span /> All caught up</span><div className="top-avatar">{user?.name?.[0]?.toUpperCase() || 'S'}</div></div></header><section className="page-content">{children}</section></main>
+    <main className="app-main"><header className="topbar"><div className="breadcrumb"><span>Workspace</span><ChevronRight size={14} /><b>{title}</b></div><div className="topbar-right"><span className="today-pill"><span /> All caught up</span><ThemeToggle theme={theme} onToggle={onToggleTheme} /><div className="top-avatar">{user?.name?.[0]?.toUpperCase() || 'S'}</div></div></header><section className="page-content">{children}</section></main>
   </div>;
 }
 
@@ -151,7 +157,14 @@ function ItemIcon({ page, type }) {
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user') || 'null'));
+  const [theme, setTheme] = useState(() => localStorage.getItem('spendsmart-theme') === 'dark' ? 'dark' : 'light');
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('spendsmart-theme', theme);
+  }, [theme]);
+  const toggleTheme = () => setTheme((current) => current === 'dark' ? 'light' : 'dark');
   async function auth(path, body) { const data = await api(path, { method: 'POST', body }); setToken(data.token); setUser(data.user); localStorage.setItem('token', data.token); localStorage.setItem('user', JSON.stringify(data.user)); }
   function logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); setToken(null); setUser(null); }
-  return <Routes><Route path="/" element={token ? <Navigate to="/dashboard" /> : <Landing />} /><Route path="/login" element={token ? <Navigate to="/dashboard" /> : <Auth register={false} auth={auth} />} /><Route path="/register" element={token ? <Navigate to="/dashboard" /> : <Auth register auth={auth} />} />{Object.keys(pageTitles).map((page) => <Route key={page} path={`/${page}`} element={token ? <Shell user={user} logout={logout}><Screen page={page} token={token} /></Shell> : <Navigate to="/login" />} />)}<Route path="*" element={<Navigate to="/" />} /></Routes>;
+  const themeProps = { theme, onToggleTheme: toggleTheme };
+  return <Routes><Route path="/" element={token ? <Navigate to="/dashboard" /> : <Landing {...themeProps} />} /><Route path="/login" element={token ? <Navigate to="/dashboard" /> : <Auth register={false} auth={auth} {...themeProps} />} /><Route path="/register" element={token ? <Navigate to="/dashboard" /> : <Auth register auth={auth} {...themeProps} />} />{Object.keys(pageTitles).map((page) => <Route key={page} path={`/${page}`} element={token ? <Shell user={user} logout={logout} {...themeProps}><Screen page={page} token={token} /></Shell> : <Navigate to="/login" />} />)}<Route path="*" element={<Navigate to="/" />} /></Routes>;
 }
