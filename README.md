@@ -1,6 +1,6 @@
 # SpendSmart
 
-SpendSmart is a personal finance app built with React, Vite, Express, MongoDB Atlas and Mongoose. Users can record income and expenses, set budgets, review charts, and track savings goals.
+SpendSmart is a personal finance app built with React, Vite, Express, MongoDB Community Server and Mongoose. Users can record income and expenses, set budgets, review charts, and track savings goals.
 
 ## Features
 - JWT authentication with bcrypt password hashing.
@@ -11,10 +11,12 @@ SpendSmart is a personal finance app built with React, Vite, Express, MongoDB At
 - Vercel deployment as two projects from this repository: a static client and an Express API.
 
 ## Local development
-1. Install Node.js 20+.
-2. Copy server/.env.example to server/.env. Set MONGODB_URI to your Atlas URI (with /spendsmart as the database path) and set a long random JWT_SECRET.
-3. Start the client and server from the repository root with npm run dev.
-4. Open http://localhost:5173. The API connection check is http://localhost:5000/api/health and should return database: connected.
+1. Install Node.js 20+ and MongoDB Community Server 9.0.
+2. From the repository root, run `npm run db:start`. This starts MongoDB and stores database files under `server/data/db`.
+3. Copy `server/.env.example` to `server/.env` if needed, then set a long random `JWT_SECRET`.
+4. Run `npm run dev` and open http://localhost:5173. The API health check at http://localhost:5001/api/health should return `database: connected`.
+
+Local development uses `mongodb://127.0.0.1:27017/spendsmart`.
 
 Root, client and server dependencies are listed in their respective package.json files. If installing from scratch, run npm install at the root, client, and server directories.
 
@@ -46,10 +48,10 @@ Deploy the client and API as two Vercel projects from the same Git repository. T
 3. Set VITE_API_URL to the API deployment origin followed by /api (for example, https://your-api.vercel.app/api) before building.
 4. Deploy and verify registration/login, dashboard data, and a direct refresh on /transactions.
 
-Add the API deployment's outbound network path to the Atlas project IP Access List as required. Never place database credentials in VITE_API_URL or any VITE_ variable: those values are public in the browser bundle.
+The deployed API cannot connect to your computer's local MongoDB address. Set MONGODB_URI to a MongoDB server reachable from the hosting provider. Never place database credentials in VITE_API_URL or any VITE_ variable: those values are public in the browser bundle.
 
 ## Environment variables
-- MONGODB_URI: Atlas connection URI with /spendsmart database path.
+- MONGODB_URI: local URI `mongodb://127.0.0.1:27017/spendsmart` for local development; use a MongoDB URI reachable from the host in deployment.
 - JWT_SECRET: long random signing secret, kept only on the API.
 - CLIENT_URL: allowed client origin, kept only on the API.
 - PORT: local API port.
@@ -60,3 +62,4 @@ The source is on the main branch. Add your own GitHub repository as origin befor
 
 ## Future enhancements
 Recurring transaction scheduling, pagination, automated insights, account integrations, and notifications.
+

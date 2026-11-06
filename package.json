@@ -1,1 +1,1 @@
-{"name":"spendsmart","private":true,"type":"module","scripts":{"dev":"concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"","build":"npm run build --prefix client"},"devDependencies":{"concurrently":"^9.1.2"}}
+{"name":"spendsmart","private":true,"type":"module","scripts":{"dev":"concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"","build":"npm run build --prefix client","db:start":"powershell -ExecutionPolicy Bypass -File server/start-mongodb.ps1"},"devDependencies":{"concurrently":"^9.1.2"}}

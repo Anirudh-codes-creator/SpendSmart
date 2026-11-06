@@ -7,3 +7,4 @@ dist
 !.env.example
 .vercel
 *.log
+server/data/
