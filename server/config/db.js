@@ -1,1 +1,1 @@
-import mongoose from'mongoose';export async function connectDB(){if(mongoose.connection.readyState!==1)await mongoose.connect(process.env.MONGODB_URI)}
+import mongoose from'mongoose';let pendingConnection;export async function connectDB(){if(mongoose.connection.readyState===1)return mongoose;if(!process.env.MONGODB_URI)throw new Error('MONGODB_URI is not configured');if(!pendingConnection){pendingConnection=mongoose.connect(process.env.MONGODB_URI,{serverSelectionTimeoutMS:10000}).catch(e=>{pendingConnection=undefined;throw e})}await pendingConnection;return mongoose}
