@@ -1,0 +1,1 @@
+import mongoose from'mongoose';export default mongoose.model('SavingsGoal',new mongoose.Schema({userId:{type:mongoose.Types.ObjectId,required:true,index:true},title:String,targetAmount:{type:Number,min:.01},currentAmount:{type:Number,default:0},deadline:Date},{timestamps:true}));

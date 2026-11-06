@@ -1,0 +1,1 @@
+import mongoose from'mongoose';export default mongoose.model('Transaction',new mongoose.Schema({userId:{type:mongoose.Types.ObjectId,required:true,index:true},title:{type:String,required:true},amount:{type:Number,min:.01,required:true},type:{type:String,enum:['income','expense']},category:String,date:{type:Date,default:Date.now},description:String},{timestamps:true}));

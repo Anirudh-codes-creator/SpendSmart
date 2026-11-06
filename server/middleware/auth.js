@@ -1,0 +1,1 @@
+import jwt from'jsonwebtoken';export function protect(req,res,next){try{req.userId=jwt.verify(req.headers.authorization.split(' ')[1],process.env.JWT_SECRET).id;next()}catch{return res.status(401).json({message:'Authentication required'})}}

@@ -1,0 +1,1 @@
+import mongoose from'mongoose';export default mongoose.model('Budget',new mongoose.Schema({userId:{type:mongoose.Types.ObjectId,required:true,index:true},category:String,monthlyLimit:{type:Number,min:.01},month:Number,year:Number},{timestamps:true}));
